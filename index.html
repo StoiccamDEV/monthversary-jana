@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Monthversary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: #e8f4f8;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .envelope-wrapper {
+            perspective: 1000px;
+        }
+
+        .envelope {
+            width: 320px;
+            height: 200px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.6s;
+        }
+
+        .envelope:hover {
+            transform: scale(1.05);
+        }
+
+        .envelope.opened {
+            cursor: default;
+            transform: scale(1);
+        }
+
+        .flap {
+            width: 320px;
+            height: 160px;
+            background: #5fa3e8;
+            position: absolute;
+            top: 0;
+            transform-origin: top;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            clip-path: polygon(0 0, 50% 60%, 100% 0);
+            z-index: 3;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .envelope.opened .flap {
+            transform: rotateX(-180deg);
+        }
+
+        .body {
+            width: 320px;
+            height: 200px;
+            background: #6ba8e8;
+            position: absolute;
+            top: 0;
+            z-index: 1;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        .letter {
+            width: 280px;
+            background: white;
+            padding: 30px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(0);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            border-radius: 4px;
+            max-height: 160px;
+            overflow: hidden;
+        }
+
+        .envelope.opened .letter {
+            opacity: 0;
+            transform: translateY(-250px) scale(1.8);
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+        }
+
+        .paper {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: #fefefe;
+            padding: 60px 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+            max-width: 550px;
+            width: 90%;
+            text-align: left;
+            border: 1px solid #e0e0e0;
+        }
+
+        .paper.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            transition-delay: 1.2s;
+        }
+
+        .paper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 60px;
+            width: 2px;
+            height: 100%;
+            background: #ffc4d0;
+            opacity: 0.3;
+        }
+
+        .paper h1 {
+            color: #4a90e2;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            font-weight: normal;
+            letter-spacing: 1px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+
+        .paper .date {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 25px;
+            text-align: right;
+            font-style: italic;
+        }
+
+        .paper .hearts {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 20px 0;
+            color: #4a90e2;
+        }
+
+        .paper p {
+            color: #333;
+            line-height: 2;
+            font-size: 1.05em;
+            margin: 20px 0;
+            text-indent: 30px;
+        }
+
+        .paper .signature {
+            margin-top: 40px;
+            text-align: right;
+            font-style: italic;
+            color: #4a90e2;
+            font-size: 1.1em;
+        }
+
+        .instruction {
+            position: absolute;
+            top: 250px;
+            color: #4a90e2;
+            font-size: 0.9em;
+            opacity: 0.8;
+            animation: pulse 2s infinite;
+            text-align: center;
+            width: 100%;
+        }
+
+        .envelope.opened ~ .instruction {
+            display: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.4; }
+        }
+
+        .sparkles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #4a90e2;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        @keyframes sparkle {
+            0% { opacity: 0; transform: translateY(0) scale(0); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-100px) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="sparkles" id="sparkles"></div>
+    
+    <div class="envelope-wrapper">
+        <div class="envelope" id="envelope">
+            <div class="flap"></div>
+            <div class="body"></div>
+            <div class="letter"></div>
+        </div>
+        <div class="instruction">Haz clic en el sobre ✨</div>
+    </div>
+
+    <div class="paper" id="paper">
+        <div class="date">8 de Noviembre, 2025</div>
+        <h1>Happy Monthversary</h1>
+        <div class="hearts">💙</div>
+        
+        <p>
+            Un mes más a tu lado y cada día me enamoro más de ti.
+            Gracias por cada sonrisa, cada momento compartido y por hacer
+            mi vida más bonita.
+        </p>
+        
+        <p>
+            Este es solo el comienzo de muchos meses más juntos.
+            Eres mi persona favorita y mi lugar seguro.
+        </p>
+        
+        <p>
+            Gracias por ser tú y por elegirme cada día.
+        </p>
+        
+        <div class="signature">~ Stoicam</div>
+    </div>
+
+    <script>
+        const envelope = document.getElementById('envelope');
+        const paper = document.getElementById('paper');
+        const sparklesContainer = document.getElementById('sparkles');
+
+        envelope.addEventListener('click', function() {
+            if (!this.classList.contains('opened')) {
+                this.classList.add('opened');
+                
+                setTimeout(() => {
+                    paper.classList.add('show');
+                    createSparkles();
+                }, 800);
+            }
+        });
+
+        function createSparkles() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.top = Math.random() * 100 + '%';
+                    sparkle.style.animation = `sparkle ${1 + Math.random()}s ease-out`;
+                    sparklesContainer.appendChild(sparkle);
+                    
+                    setTimeout(() => sparkle.remove(), 2000);
+                }, i * 50);
+            }
+        }
+    </script>
+</body>
+</html>
